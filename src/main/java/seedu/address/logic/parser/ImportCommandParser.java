@@ -1,4 +1,4 @@
-package seedu.address.logic.parser.commandparsers;
+package seedu.address.logic.parser;
 
 import static seedu.address.commons.core.Messages.MESSAGE_INVALID_COMMAND_FORMAT;
 import static seedu.address.commons.core.Messages.MESSAGE_UNKNOWN_COMMAND;
@@ -15,7 +15,7 @@ import seedu.address.logic.parser.exceptions.ParseException;
 /**
  * Parses input arguments and creates a new ImportCommand object
  */
-public class ImportCommandParser implements CommandParser<ImportCommand> {
+public class ImportCommandParser implements Parser<ImportCommand> {
 
     private static final Pattern IMPORT_COMMAND_FORMAT = Pattern.compile("(?<commandWord>\\S+)(?<arguments>.*)");
 
@@ -26,7 +26,7 @@ public class ImportCommandParser implements CommandParser<ImportCommand> {
             throw new ParseException(String.format(MESSAGE_INVALID_COMMAND_FORMAT, HelpCommand.MESSAGE_USAGE));
         }
 
-        final String commandWord = "import" + matcher.group("commandWord");
+        final String commandWord = "import " + matcher.group("commandWord");
         final String arguments = matcher.group("arguments").trim();
         switch (commandWord) {
 
