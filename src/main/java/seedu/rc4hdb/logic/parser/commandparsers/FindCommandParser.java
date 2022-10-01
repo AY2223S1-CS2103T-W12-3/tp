@@ -1,4 +1,4 @@
-package seedu.rc4hdb.logic.parser;
+package seedu.rc4hdb.logic.parser.commandparsers;
 
 import static seedu.rc4hdb.commons.core.Messages.MESSAGE_INVALID_COMMAND_FORMAT;
 
@@ -11,7 +11,7 @@ import seedu.rc4hdb.model.person.NameContainsKeywordsPredicate;
 /**
  * Parses input arguments and creates a new FindCommand object
  */
-public class FindCommandParser implements Parser<FindCommand> {
+public class FindCommandParser implements CommandParser<FindCommand> {
 
     /**
      * Parses the given {@code String} of arguments in the context of the FindCommand

@@ -1,4 +1,4 @@
-package seedu.rc4hdb.logic.parser;
+package seedu.rc4hdb.logic.parser.commandparsers;
 
 import static seedu.rc4hdb.commons.core.Messages.MESSAGE_INVALID_COMMAND_FORMAT;
 import static seedu.rc4hdb.logic.parser.CliSyntax.PREFIX_ADDRESS;
@@ -11,6 +11,10 @@ import java.util.Set;
 import java.util.stream.Stream;
 
 import seedu.rc4hdb.logic.commands.AddCommand;
+import seedu.rc4hdb.logic.parser.ArgumentMultimap;
+import seedu.rc4hdb.logic.parser.ArgumentTokenizer;
+import seedu.rc4hdb.logic.parser.ParserUtil;
+import seedu.rc4hdb.logic.parser.Prefix;
 import seedu.rc4hdb.logic.parser.exceptions.ParseException;
 import seedu.rc4hdb.model.person.Address;
 import seedu.rc4hdb.model.person.Email;
@@ -22,7 +26,7 @@ import seedu.rc4hdb.model.tag.Tag;
 /**
  * Parses input arguments and creates a new AddCommand object
  */
-public class AddCommandParser implements Parser<AddCommand> {
+public class AddCommandParser implements CommandParser<AddCommand> {
 
     /**
      * Parses the given {@code String} of arguments in the context of the AddCommand

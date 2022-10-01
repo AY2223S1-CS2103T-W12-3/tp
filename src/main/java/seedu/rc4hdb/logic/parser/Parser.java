@@ -1,16 +1,15 @@
 package seedu.rc4hdb.logic.parser;
 
-import seedu.rc4hdb.logic.commands.Command;
 import seedu.rc4hdb.logic.parser.exceptions.ParseException;
 
 /**
- * Represents a Parser that is able to parse user input into a {@code Command} of type {@code T}.
+ * Represents a Parser that is able to parse a string into an {@code Object} of type {@code T}.
  */
-public interface Parser<T extends Command> {
+public interface Parser<T> {
 
     /**
-     * Parses {@code userInput} into a command and returns it.
-     * @throws ParseException if {@code userInput} does not conform the expected format
+     * Parses {@code string} into an {@code Object} of type {@code T} and returns it.
+     * @throws ParseException if {@code string} does not conform the expected format
      */
-    T parse(String userInput) throws ParseException;
+    T parse(String string) throws ParseException;
 }
