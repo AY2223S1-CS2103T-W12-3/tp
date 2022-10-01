@@ -10,6 +10,7 @@ import static seedu.rc4hdb.logic.parser.CliSyntax.PREFIX_TAG;
 import seedu.rc4hdb.logic.commands.exceptions.CommandException;
 import seedu.rc4hdb.model.Model;
 import seedu.rc4hdb.model.person.Person;
+import seedu.rc4hdb.storage.Storage;
 
 /**
  * Adds a person to the address book.
@@ -47,7 +48,7 @@ public class AddCommand extends Command {
     }
 
     @Override
-    public CommandResult execute(Model model) throws CommandException {
+    public CommandResult execute(Model model, Storage storage) throws CommandException {
         requireNonNull(model);
 
         if (model.hasPerson(toAdd)) {

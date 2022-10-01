@@ -1,5 +1,6 @@
 package seedu.rc4hdb.logic.commands;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static seedu.rc4hdb.logic.parser.CliSyntax.PREFIX_ADDRESS;
@@ -9,16 +10,21 @@ import static seedu.rc4hdb.logic.parser.CliSyntax.PREFIX_PHONE;
 import static seedu.rc4hdb.logic.parser.CliSyntax.PREFIX_TAG;
 import static seedu.rc4hdb.testutil.Assert.assertThrows;
 
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import seedu.rc4hdb.commons.core.index.Index;
 import seedu.rc4hdb.logic.commands.exceptions.CommandException;
 import seedu.rc4hdb.model.AddressBook;
 import seedu.rc4hdb.model.Model;
+import seedu.rc4hdb.model.ReadOnlyAddressBook;
+import seedu.rc4hdb.model.UserPrefs;
 import seedu.rc4hdb.model.person.NameContainsKeywordsPredicate;
 import seedu.rc4hdb.model.person.Person;
+import seedu.rc4hdb.storage.Storage;
 import seedu.rc4hdb.testutil.EditPersonDescriptorBuilder;
 
 /**
@@ -74,25 +80,84 @@ public class CommandTestUtil {
      * - the returned {@link CommandResult} matches {@code expectedCommandResult} <br>
      * - the {@code actualModel} matches {@code expectedModel}
      */
-    public static void assertCommandSuccess(Command command, Model actualModel, CommandResult expectedCommandResult,
-            Model expectedModel) {
+    public static void assertCommandSuccess(Command command, Model actualModel, Storage actualStorage,
+            CommandResult expectedCommandResult, Model expectedModel, Storage expectedStorage) {
         try {
-            CommandResult result = command.execute(actualModel);
+            CommandResult result = command.execute(actualModel, actualStorage);
             assertEquals(expectedCommandResult, result);
             assertEquals(expectedModel, actualModel);
+            assertEquals(expectedStorage, actualStorage);
         } catch (CommandException ce) {
             throw new AssertionError("Execution of command should not fail.", ce);
         }
     }
 
     /**
-     * Convenience wrapper to {@link #assertCommandSuccess(Command, Model, CommandResult, Model)}
+     * Convenience wrapper to {@link #assertCommandSuccess(Command, Model, Storage, CommandResult, Model, Storage)}
      * that takes a string {@code expectedMessage}.
      */
-    public static void assertCommandSuccess(Command command, Model actualModel, String expectedMessage,
-            Model expectedModel) {
+    public static void assertCommandSuccess(Command command, Model actualModel, Storage actualStorage,
+            String expectedMessage, Model expectedModel, Storage expectedStorage) {
         CommandResult expectedCommandResult = new CommandResult(expectedMessage);
-        assertCommandSuccess(command, actualModel, expectedCommandResult, expectedModel);
+        assertCommandSuccess(command, actualModel, actualStorage, expectedCommandResult, expectedModel,
+                expectedStorage);
+    }
+
+    /**
+     * Asserts that the execution of {@code command} fails. Makes sure that the {@code actualModel} and the
+     * {@code actualStorage} are unchanged.
+     * @param command The command to be executed
+     * @param actualModel The model the command is to be executed on
+     * @param actualStorage The storage the command is to be executed on
+     * @param expectedMessage The message that is expected to be produced by the execution of command
+     */
+    public static void assertCommandFailure(Command command, Model actualModel, Storage actualStorage,
+                                            String expectedMessage) {
+        if (actualModel instanceof CommandTestStubs.ModelStub) {
+            assertCommandFailureModelStub(command, actualStorage, expectedMessage);
+        } else if (actualStorage instanceof CommandTestStubs.StorageStub) {
+            assertCommandFailureStorageStub(command, actualModel, expectedMessage);
+        } else {
+            assertCommandFailureNoStub(command, actualModel, actualStorage, expectedMessage);
+        }
+    }
+
+    /**
+     * Executes the given {@code command}, confirms that <br>
+     * - a {@code CommandException} is thrown <br>
+     * - the CommandException message matches {@code expectedMessage} <br>
+     * - the address book, filtered person list and selected person in {@code actualModel} remain unchanged
+     * - the user preference storage and address book storage file path in {@code actualStorage} remain unchanged
+     * - the file contents corresponding to the file paths in {@code actualStorage} remain unchanged
+     */
+    private static void assertCommandFailureNoStub(Command command, Model actualModel, Storage actualStorage,
+                                                   String expectedMessage) {
+        // we are unable to defensively copy the model for comparison later, so we can
+        // only do so by copying its components.
+        AddressBook expectedAddressBook = new AddressBook(actualModel.getAddressBook());
+        List<Person> expectedFilteredList = new ArrayList<>(actualModel.getFilteredPersonList());
+
+        Path expectedAddressBookStorageFilePath = actualStorage.getAddressBookFilePath();
+        Path expectedUserPrefStorageFilePath = actualStorage.getUserPrefsFilePath();
+        Optional<ReadOnlyAddressBook> expectedReadAddressBook = assertDoesNotThrow(() ->
+                actualStorage.readAddressBook());
+        Optional<UserPrefs> expectedReadUserPref = assertDoesNotThrow(actualStorage::readUserPrefs);
+
+        assertThrows(CommandException.class, expectedMessage, () -> command.execute(actualModel, actualStorage));
+
+        Optional<ReadOnlyAddressBook> actualReadAddressBook = assertDoesNotThrow(() ->
+                actualStorage.readAddressBook());
+        Optional<UserPrefs> actualReadUserPref = assertDoesNotThrow(actualStorage::readUserPrefs);
+
+        // Checks whether model was modified
+        assertEquals(expectedAddressBook, actualModel.getAddressBook());
+        assertEquals(expectedFilteredList, actualModel.getFilteredPersonList());
+
+        // Checks whether storage was modified
+        assertEquals(expectedAddressBookStorageFilePath, actualStorage.getAddressBookFilePath());
+        assertEquals(expectedUserPrefStorageFilePath, actualStorage.getUserPrefsFilePath());
+        assertEquals(expectedReadAddressBook, actualReadAddressBook);
+        assertEquals(expectedReadUserPref, actualReadUserPref);
     }
 
     /**
@@ -101,16 +166,50 @@ public class CommandTestUtil {
      * - the CommandException message matches {@code expectedMessage} <br>
      * - the address book, filtered person list and selected person in {@code actualModel} remain unchanged
      */
-    public static void assertCommandFailure(Command command, Model actualModel, String expectedMessage) {
+    private static void assertCommandFailureStorageStub(Command command, Model actualModel, String expectedMessage) {
+        Storage storageStub = new CommandTestStubs.StorageStub();
+
         // we are unable to defensively copy the model for comparison later, so we can
         // only do so by copying its components.
         AddressBook expectedAddressBook = new AddressBook(actualModel.getAddressBook());
         List<Person> expectedFilteredList = new ArrayList<>(actualModel.getFilteredPersonList());
 
-        assertThrows(CommandException.class, expectedMessage, () -> command.execute(actualModel));
+        assertThrows(CommandException.class, expectedMessage, () -> command.execute(actualModel, storageStub));
+
+        // Checks whether model was modified
         assertEquals(expectedAddressBook, actualModel.getAddressBook());
         assertEquals(expectedFilteredList, actualModel.getFilteredPersonList());
     }
+
+    /**
+     * Executes the given {@code command}, confirms that <br>
+     * - a {@code CommandException} is thrown <br>
+     * - the CommandException message matches {@code expectedMessage} <br>
+     * - the user preference storage and address book storage file path in {@code actualStorage} remain unchanged
+     * - the file contents corresponding to the file paths in {@code actualStorage} remain unchanged
+     */
+    private static void assertCommandFailureModelStub(Command command, Storage actualStorage, String expectedMessage) {
+        Model modelStub = new CommandTestStubs.ModelStub();
+
+        Path expectedAddressBookStorageFilePath = actualStorage.getAddressBookFilePath();
+        Path expectedUserPrefStorageFilePath = actualStorage.getUserPrefsFilePath();
+        Optional<ReadOnlyAddressBook> expectedReadAddressBook = assertDoesNotThrow(() ->
+                actualStorage.readAddressBook());
+        Optional<UserPrefs> expectedReadUserPref = assertDoesNotThrow(actualStorage::readUserPrefs);
+
+        assertThrows(CommandException.class, expectedMessage, () -> command.execute(modelStub, actualStorage));
+
+        Optional<ReadOnlyAddressBook> actualReadAddressBook = assertDoesNotThrow(() ->
+                actualStorage.readAddressBook());
+        Optional<UserPrefs> actualReadUserPref = assertDoesNotThrow(actualStorage::readUserPrefs);
+
+        // Checks whether storage was modified
+        assertEquals(expectedAddressBookStorageFilePath, actualStorage.getAddressBookFilePath());
+        assertEquals(expectedUserPrefStorageFilePath, actualStorage.getUserPrefsFilePath());
+        assertEquals(expectedReadAddressBook, actualReadAddressBook);
+        assertEquals(expectedReadUserPref, actualReadUserPref);
+    }
+
     /**
      * Updates {@code model}'s filtered list to show only the person at the given {@code targetIndex} in the
      * {@code model}'s address book.

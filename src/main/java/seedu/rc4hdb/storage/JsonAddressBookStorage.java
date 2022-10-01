@@ -77,4 +77,16 @@ public class JsonAddressBookStorage implements AddressBookStorage {
         JsonUtil.saveJsonFile(new JsonSerializableAddressBook(addressBook), filePath);
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        } else if (o == null || getClass() != o.getClass()) {
+            return false;
+        } else {
+            JsonAddressBookStorage that = (JsonAddressBookStorage) o;
+            return filePath.equals(that.filePath);
+        }
+    }
+
 }

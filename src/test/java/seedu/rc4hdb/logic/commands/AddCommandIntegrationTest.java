@@ -11,6 +11,7 @@ import seedu.rc4hdb.model.Model;
 import seedu.rc4hdb.model.ModelManager;
 import seedu.rc4hdb.model.UserPrefs;
 import seedu.rc4hdb.model.person.Person;
+import seedu.rc4hdb.storage.Storage;
 import seedu.rc4hdb.testutil.PersonBuilder;
 
 /**
@@ -19,6 +20,7 @@ import seedu.rc4hdb.testutil.PersonBuilder;
 public class AddCommandIntegrationTest {
 
     private Model model;
+    private Storage storageStub = new CommandTestStubs.StorageStub();
 
     @BeforeEach
     public void setUp() {
@@ -32,14 +34,14 @@ public class AddCommandIntegrationTest {
         Model expectedModel = new ModelManager(model.getAddressBook(), new UserPrefs());
         expectedModel.addPerson(validPerson);
 
-        assertCommandSuccess(new AddCommand(validPerson), model,
-                String.format(AddCommand.MESSAGE_SUCCESS, validPerson), expectedModel);
+        assertCommandSuccess(new AddCommand(validPerson), model, storageStub,
+                String.format(AddCommand.MESSAGE_SUCCESS, validPerson), expectedModel, storageStub);
     }
 
     @Test
     public void execute_duplicatePerson_throwsCommandException() {
         Person personInList = model.getAddressBook().getPersonList().get(0);
-        assertCommandFailure(new AddCommand(personInList), model, AddCommand.MESSAGE_DUPLICATE_PERSON);
+        assertCommandFailure(new AddCommand(personInList), model, storageStub, AddCommand.MESSAGE_DUPLICATE_PERSON);
     }
 
 }

@@ -1,7 +1,11 @@
 package seedu.rc4hdb.testutil;
 
+import java.nio.file.Path;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.function.Executable;
+
+import seedu.rc4hdb.commons.util.FileUtil;
 
 /**
  * A set of assertion methods useful for writing tests.
@@ -31,4 +35,18 @@ public class Assert {
         Throwable thrownException = Assertions.assertThrows(expectedType, executable);
         Assertions.assertEquals(expectedMessage, thrownException.getMessage());
     }
+
+    /**
+     * Asserts that the contents of the files corresponding to {@code expectedFilePath} and {@code actualFilePath} are
+     * the same.
+     * @param expectedFilePath The path that corresponds to the expected file.
+     * @param actualFilePath The path that corresponds to the actual file.
+     */
+    public static void assertFileContentEqual(Path expectedFilePath, Path actualFilePath) {
+        Assertions.assertTrue(FileUtil.isFileExists(expectedFilePath) && FileUtil.isFileExists(actualFilePath));
+        String expectedContents = Assertions.assertDoesNotThrow(() -> FileUtil.readFromFile(expectedFilePath));
+        String actualContents = Assertions.assertDoesNotThrow(() -> FileUtil.readFromFile(actualFilePath));
+        Assertions.assertEquals(expectedContents, actualContents);
+    }
+
 }

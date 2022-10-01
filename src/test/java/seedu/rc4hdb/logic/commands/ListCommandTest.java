@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import seedu.rc4hdb.model.Model;
 import seedu.rc4hdb.model.ModelManager;
 import seedu.rc4hdb.model.UserPrefs;
+import seedu.rc4hdb.storage.Storage;
 
 /**
  * Contains integration tests (interaction with the Model) and unit tests for ListCommand.
@@ -19,6 +20,7 @@ public class ListCommandTest {
 
     private Model model;
     private Model expectedModel;
+    private Storage storageStub = new CommandTestStubs.StorageStub();
 
     @BeforeEach
     public void setUp() {
@@ -28,12 +30,14 @@ public class ListCommandTest {
 
     @Test
     public void execute_listIsNotFiltered_showsSameList() {
-        assertCommandSuccess(new ListCommand(), model, ListCommand.MESSAGE_SUCCESS, expectedModel);
+        assertCommandSuccess(new ListCommand(), model, storageStub, ListCommand.MESSAGE_SUCCESS, expectedModel,
+                storageStub);
     }
 
     @Test
     public void execute_listIsFiltered_showsEverything() {
         showPersonAtIndex(model, INDEX_FIRST_PERSON);
-        assertCommandSuccess(new ListCommand(), model, ListCommand.MESSAGE_SUCCESS, expectedModel);
+        assertCommandSuccess(new ListCommand(), model, storageStub, ListCommand.MESSAGE_SUCCESS, expectedModel,
+                storageStub);
     }
 }

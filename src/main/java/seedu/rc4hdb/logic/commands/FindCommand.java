@@ -5,6 +5,7 @@ import static java.util.Objects.requireNonNull;
 import seedu.rc4hdb.commons.core.Messages;
 import seedu.rc4hdb.model.Model;
 import seedu.rc4hdb.model.person.NameContainsKeywordsPredicate;
+import seedu.rc4hdb.storage.Storage;
 
 /**
  * Finds and lists all persons in address book whose name contains any of the argument keywords.
@@ -26,7 +27,7 @@ public class FindCommand extends Command {
     }
 
     @Override
-    public CommandResult execute(Model model) {
+    public CommandResult execute(Model model, Storage storage) {
         requireNonNull(model);
         model.updateFilteredPersonList(predicate);
         return new CommandResult(

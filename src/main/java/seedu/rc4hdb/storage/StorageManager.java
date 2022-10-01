@@ -75,4 +75,17 @@ public class StorageManager implements Storage {
         addressBookStorage.saveAddressBook(addressBook, filePath);
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        } else if (o == null || getClass() != o.getClass()) {
+            return false;
+        } else {
+            StorageManager that = (StorageManager) o;
+            return addressBookStorage.equals(that.addressBookStorage)
+                    && userPrefsStorage.equals(that.userPrefsStorage);
+        }
+    }
+
 }

@@ -9,6 +9,7 @@ import seedu.rc4hdb.commons.core.index.Index;
 import seedu.rc4hdb.logic.commands.exceptions.CommandException;
 import seedu.rc4hdb.model.Model;
 import seedu.rc4hdb.model.person.Person;
+import seedu.rc4hdb.storage.Storage;
 
 /**
  * Deletes a person identified using it's displayed index from the address book.
@@ -31,7 +32,7 @@ public class DeleteCommand extends Command {
     }
 
     @Override
-    public CommandResult execute(Model model) throws CommandException {
+    public CommandResult execute(Model model, Storage storage) throws CommandException {
         requireNonNull(model);
         List<Person> lastShownList = model.getFilteredPersonList();
 

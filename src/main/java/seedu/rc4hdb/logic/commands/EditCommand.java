@@ -25,6 +25,7 @@ import seedu.rc4hdb.model.person.Name;
 import seedu.rc4hdb.model.person.Person;
 import seedu.rc4hdb.model.person.Phone;
 import seedu.rc4hdb.model.tag.Tag;
+import seedu.rc4hdb.storage.Storage;
 
 /**
  * Edits the details of an existing person in the address book.
@@ -66,7 +67,7 @@ public class EditCommand extends Command {
     }
 
     @Override
-    public CommandResult execute(Model model) throws CommandException {
+    public CommandResult execute(Model model, Storage storage) throws CommandException {
         requireNonNull(model);
         List<Person> lastShownList = model.getFilteredPersonList();
 
