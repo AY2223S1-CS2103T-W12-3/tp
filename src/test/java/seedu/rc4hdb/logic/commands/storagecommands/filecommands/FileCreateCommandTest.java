@@ -15,6 +15,7 @@ import org.junit.jupiter.api.io.TempDir;
 import seedu.rc4hdb.commons.util.FileUtil;
 import seedu.rc4hdb.logic.StorageStub;
 import seedu.rc4hdb.logic.commands.exceptions.CommandException;
+import seedu.rc4hdb.logic.commands.storagecommands.filecommands.jsonfilecommands.FileCreateCommand;
 import seedu.rc4hdb.storage.JsonResidentBookStorage;
 import seedu.rc4hdb.storage.JsonUserPrefsStorage;
 import seedu.rc4hdb.storage.ResidentBookStorage;
@@ -39,6 +40,10 @@ public class FileCreateCommandTest {
         storage = new StorageManager(residentBookStorage, userPrefsStorage);
     }
 
+    private String getTempFilePathString(String fileName) {
+        return testFolder.resolve(fileName).toString();
+    }
+
     private Path getTempFilePath(String fileName) {
         return testFolder.resolve(fileName);
     }
@@ -51,20 +56,22 @@ public class FileCreateCommandTest {
         Storage expectedStorage = new StorageManager(expectedResidentBookStorage, expectedUserPrefsStorage);
         String expectedMessage = String.format(FileCreateCommand.MESSAGE_SUCCESS, "DoesNotExist.json");
 
-        Path filePath = getTempFilePath("DoesNotExist.json");
-        FileCreateCommand fileCreateCommand = new FileCreateCommand(filePath);
+        String targetFilePathString = getTempFilePathString("DoesNotExist");
+        Path targetFilePath = getTempFilePath("DoesNotExist.json");
+        FileCreateCommand fileCreateCommand = new FileCreateCommand(targetFilePathString);
 
         assertCommandSuccess(fileCreateCommand, storage, expectedMessage, expectedStorage);
-        assertFileExists(filePath);
+        assertFileExists(targetFilePath);
     }
 
     @Test
     public void execute_currentFile_throwsCommandException() throws Exception {
-        Path target = getTempFilePath("test.json");
+        Path targetFilePath = getTempFilePath("test.json");
+        String targetFilePathString = getTempFilePathString("test");
 
         String expectedMessage = String.format(FileCommand.MESSAGE_TRYING_TO_EXECUTE_ON_CURRENT_FILE, "test.json");
-        FileCreateCommand fileCreateCommand = new FileCreateCommand(target);
-        FileUtil.createIfMissing(target);
+        FileCreateCommand fileCreateCommand = new FileCreateCommand(targetFilePathString);
+        FileUtil.createIfMissing(targetFilePath);
 
         assertCommandFailure(fileCreateCommand, storage, expectedMessage);
     }
@@ -73,9 +80,10 @@ public class FileCreateCommandTest {
     public void execute_fileAlreadyExists_throwsCommandException() throws IOException {
         String expectedMessage = String.format(FileCreateCommand.MESSAGE_FILE_EXISTS, "AlreadyExists.json");
 
-        Path filePath = getTempFilePath("AlreadyExists.json");
-        FileCreateCommand fileCreateCommand = new FileCreateCommand(filePath);
-        FileUtil.createFile(filePath);
+        Path targetFilePath = getTempFilePath("AlreadyExists.json");
+        String targetFilePathString = getTempFilePathString("AlreadyExists");
+        FileCreateCommand fileCreateCommand = new FileCreateCommand(targetFilePathString);
+        FileUtil.createFile(targetFilePath);
 
         assertCommandFailure(fileCreateCommand, storage, expectedMessage);
     }
@@ -84,8 +92,9 @@ public class FileCreateCommandTest {
     public void execute_storageThrowsIoException_throwsCommandException() {
         String expectedMessage = String.format(FileCreateCommand.MESSAGE_FAILED, "creating");
 
-        Path filePath = getTempFilePath("DoesNotExist.json");
-        FileCreateCommand fileCreateCommand = new FileCreateCommand(filePath);
+        Path targetFilePath = getTempFilePath("DoesNotExist.json");
+        String targetFilePathString = getTempFilePathString("DoesNotExist");
+        FileCreateCommand fileCreateCommand = new FileCreateCommand(targetFilePathString);
         storage = new StorageStubThrowsIoException();
 
         assertThrows(CommandException.class, expectedMessage, () -> fileCreateCommand.execute(storage));

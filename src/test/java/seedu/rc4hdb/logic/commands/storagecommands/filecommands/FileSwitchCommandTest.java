@@ -17,6 +17,7 @@ import seedu.rc4hdb.commons.util.FileUtil;
 import seedu.rc4hdb.commons.util.JsonUtil;
 import seedu.rc4hdb.logic.StorageStub;
 import seedu.rc4hdb.logic.commands.exceptions.CommandException;
+import seedu.rc4hdb.logic.commands.storagecommands.filecommands.jsonfilecommands.FileSwitchCommand;
 import seedu.rc4hdb.model.Model;
 import seedu.rc4hdb.model.ModelManager;
 import seedu.rc4hdb.model.ReadOnlyResidentBook;
@@ -46,71 +47,79 @@ public class FileSwitchCommandTest {
         model = new ModelManager();
     }
 
+    private String getTempFilePathString(String fileName) {
+        return testFolder.resolve(fileName).toString();
+    }
+
     private Path getTempFilePath(String fileName) {
         return testFolder.resolve(fileName);
     }
 
     @Test
     public void execute_existingFile_switchFiles() throws Exception {
-        Path target = getTempFilePath("target.json");
+        Path targetFilePath = getTempFilePath("target.json");
+        String targetFilePathString = getTempFilePathString("target");
         Path userPrefPath = getTempFilePath("testPrefs.json");
 
         String expectedMessage = String.format(FileSwitchCommand.MESSAGE_SUCCESS, "target.json");
         Storage expectedStorage = new StorageManager(
-                new JsonResidentBookStorage(target), new JsonUserPrefsStorage(userPrefPath));
+                new JsonResidentBookStorage(targetFilePath), new JsonUserPrefsStorage(userPrefPath));
         Model expectedModel = new ModelManager();
-        expectedModel.setResidentBookFilePath(target);
+        expectedModel.setResidentBookFilePath(targetFilePath);
 
-        FileSwitchCommand fileSwitchCommand = new FileSwitchCommand(target);
-        createEmptyJsonFile(target);
+        FileSwitchCommand fileSwitchCommand = new FileSwitchCommand(targetFilePathString);
+        createEmptyJsonFile(targetFilePath);
 
         assertCommandSuccess(fileSwitchCommand, storage, model, expectedMessage, expectedStorage, expectedModel);
     }
 
     @Test
     public void execute_currentFile_throwsCommandException() throws Exception {
-        Path target = getTempFilePath("test.json");
+        Path targetFilePath = getTempFilePath("test.json");
+        String targetFilePathString = getTempFilePathString("test");
 
         String expectedMessage = String.format(FileCommand.MESSAGE_TRYING_TO_EXECUTE_ON_CURRENT_FILE, "test.json");
-        FileSwitchCommand fileSwitchCommand = new FileSwitchCommand(target);
-        createEmptyJsonFile(target);
+        FileSwitchCommand fileSwitchCommand = new FileSwitchCommand(targetFilePathString);
+        createEmptyJsonFile(targetFilePath);
 
         assertCommandFailure(fileSwitchCommand, storage, model, expectedMessage);
     }
 
     @Test
     public void execute_targetFileDoesNotExist_throwsCommandException() {
-        Path target = getTempFilePath("target.json");
+        String targetFilePathString = getTempFilePathString("target");
 
         String expectedMessage = String.format(FileSwitchCommand.MESSAGE_FILE_DOES_NOT_EXIST, "target.json");
 
-        FileSwitchCommand fileSwitchCommand = new FileSwitchCommand(target);
+        FileSwitchCommand fileSwitchCommand = new FileSwitchCommand(targetFilePathString);
 
         assertCommandFailure(fileSwitchCommand, storage, model, expectedMessage);
     }
 
     @Test
     public void execute_invalidDataFileFormat_throwsCommandException() throws Exception {
-        Path target = getTempFilePath("target.json");
+        Path targetFilePath = getTempFilePath("target.json");
+        String targetFilePathString = getTempFilePathString("target");
 
         String expectedMessage = String.format(FileSwitchCommand.MESSAGE_INVALID_FILE_DATA, "target.json");
 
-        FileSwitchCommand fileSwitchCommand = new FileSwitchCommand(target);
+        FileSwitchCommand fileSwitchCommand = new FileSwitchCommand(targetFilePathString);
         storage = new StorageStubThrowsDataConversionException();
-        createEmptyJsonFile(target);
+        createEmptyJsonFile(targetFilePath);
 
         assertThrows(CommandException.class, expectedMessage, () -> fileSwitchCommand.execute(storage, model));
     }
 
     @Test
     public void execute_storageThrowsIoException_throwsCommandException() throws Exception {
-        Path target = getTempFilePath("target.json");
+        Path targetFilePath = getTempFilePath("target.json");
+        String targetFilePathString = getTempFilePathString("target");
 
         String expectedMessage = String.format(FileSwitchCommand.MESSAGE_FAILED, "switching");
 
-        FileSwitchCommand fileSwitchCommand = new FileSwitchCommand(target);
+        FileSwitchCommand fileSwitchCommand = new FileSwitchCommand(targetFilePathString);
         storage = new StorageStubThrowsIoException();
-        createEmptyJsonFile(target);
+        createEmptyJsonFile(targetFilePath);
 
         assertThrows(CommandException.class, expectedMessage, () -> fileSwitchCommand.execute(storage, model));
     }
