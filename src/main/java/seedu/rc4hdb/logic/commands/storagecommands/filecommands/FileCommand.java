@@ -56,7 +56,8 @@ public abstract class FileCommand implements Command {
     public boolean equals(Object other) {
         return other == this // short circuit if same object
                 || (other instanceof FileCommand // instanceof handles nulls
-                && filePath.equals(((FileCommand) other).filePath));
+                && filePath.equals(((FileCommand) other).filePath)
+                && fileName.equals(((FileCommand) other).fileName));
     }
 
 }
