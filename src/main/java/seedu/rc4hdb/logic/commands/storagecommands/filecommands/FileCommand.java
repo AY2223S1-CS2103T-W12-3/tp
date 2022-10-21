@@ -18,9 +18,6 @@ public abstract class FileCommand implements Command {
     public static final String MESSAGE_INVALID_FILE_NAME = "File name must not have any whitespaces, fullstops, "
             + "forward and backslashes.";
 
-    public static final String MESSAGE_TRYING_TO_EXECUTE_ON_CURRENT_FILE = "%s is the current working data file. "
-            + "Try another file.";
-
     /**
      * Stores the set of restricted characters. Add to the set to add restricted characters.
      */
@@ -56,7 +53,8 @@ public abstract class FileCommand implements Command {
     public boolean equals(Object other) {
         return other == this // short circuit if same object
                 || (other instanceof FileCommand // instanceof handles nulls
-                && filePath.equals(((FileCommand) other).filePath));
+                && filePath.equals(((FileCommand) other).filePath)
+                && fileName.equals(((FileCommand) other).fileName));
     }
 
 }

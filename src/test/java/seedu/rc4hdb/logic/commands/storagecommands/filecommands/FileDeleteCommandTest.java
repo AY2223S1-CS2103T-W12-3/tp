@@ -3,6 +3,7 @@ package seedu.rc4hdb.logic.commands.storagecommands.filecommands;
 import static seedu.rc4hdb.logic.commands.storagecommands.StorageCommandTestUtil.assertCommandFailure;
 import static seedu.rc4hdb.logic.commands.storagecommands.StorageCommandTestUtil.assertCommandSuccess;
 import static seedu.rc4hdb.logic.commands.storagecommands.StorageCommandTestUtil.assertFileDoesNotExist;
+import static seedu.rc4hdb.logic.commands.storagecommands.filecommands.jsonfilecommands.JsonFileCommand.JSON_POSTFIX;
 import static seedu.rc4hdb.testutil.Assert.assertThrows;
 
 import java.io.IOException;
@@ -15,6 +16,8 @@ import org.junit.jupiter.api.io.TempDir;
 import seedu.rc4hdb.commons.util.FileUtil;
 import seedu.rc4hdb.logic.StorageStub;
 import seedu.rc4hdb.logic.commands.exceptions.CommandException;
+import seedu.rc4hdb.logic.commands.storagecommands.filecommands.jsonfilecommands.FileDeleteCommand;
+import seedu.rc4hdb.logic.commands.storagecommands.filecommands.jsonfilecommands.JsonFileCommand;
 import seedu.rc4hdb.storage.JsonResidentBookStorage;
 import seedu.rc4hdb.storage.JsonUserPrefsStorage;
 import seedu.rc4hdb.storage.ResidentBookStorage;
@@ -34,13 +37,17 @@ public class FileDeleteCommandTest {
 
     @BeforeEach
     public void setUp() {
-        JsonResidentBookStorage residentBookStorage = new JsonResidentBookStorage(getTempFilePath("test.json"));
-        JsonUserPrefsStorage userPrefsStorage = new JsonUserPrefsStorage(getTempFilePath("testPrefs.json"));
+        JsonResidentBookStorage residentBookStorage = new JsonResidentBookStorage(getTempJsonFilePath("test"));
+        JsonUserPrefsStorage userPrefsStorage = new JsonUserPrefsStorage(getTempJsonFilePath("testPrefs"));
         storage = new StorageManager(residentBookStorage, userPrefsStorage);
     }
 
-    private Path getTempFilePath(String fileName) {
-        return testFolder.resolve(fileName);
+    private Path getTempJsonFilePath(String fileName) {
+        return testFolder.resolve(fileName + JSON_POSTFIX);
+    }
+
+    private String getTempFilePathString(String fileName) {
+        return testFolder.resolve(fileName).toString();
     }
 
     @Test
@@ -51,8 +58,9 @@ public class FileDeleteCommandTest {
         Storage expectedStorage = new StorageManager(expectedResidentBookStorage, expectedUserPrefsStorage);
         String expectedMessage = String.format(FileDeleteCommand.MESSAGE_SUCCESS, "AlreadyExists.json");
 
-        Path filePath = getTempFilePath("AlreadyExists.json");
-        FileDeleteCommand fileDeleteCommand = new FileDeleteCommand(filePath);
+        Path filePath = getTempJsonFilePath("AlreadyExists");
+        String targetFilePathString = getTempFilePathString("AlreadyExists");
+        FileDeleteCommand fileDeleteCommand = new FileDeleteCommand(targetFilePathString);
         FileUtil.createFile(filePath);
 
         assertCommandSuccess(fileDeleteCommand, storage, expectedMessage, expectedStorage);
@@ -61,11 +69,12 @@ public class FileDeleteCommandTest {
 
     @Test
     public void execute_currentFile_throwsCommandException() throws Exception {
-        Path target = getTempFilePath("test.json");
+        Path targetFilePath = getTempJsonFilePath("test");
+        String targetFilePathString = getTempFilePathString("test");
 
-        String expectedMessage = String.format(FileCommand.MESSAGE_TRYING_TO_EXECUTE_ON_CURRENT_FILE, "test.json");
-        FileDeleteCommand fileDeleteCommand = new FileDeleteCommand(target);
-        FileUtil.createIfMissing(target);
+        String expectedMessage = String.format(JsonFileCommand.MESSAGE_TRYING_TO_EXECUTE_ON_CURRENT_FILE, "test.json");
+        FileDeleteCommand fileDeleteCommand = new FileDeleteCommand(targetFilePathString);
+        FileUtil.createIfMissing(targetFilePath);
 
         assertCommandFailure(fileDeleteCommand, storage, expectedMessage);
     }
@@ -74,8 +83,8 @@ public class FileDeleteCommandTest {
     public void execute_fileDoesNotExist_throwsCommandException() {
         String expectedMessage = String.format(FileDeleteCommand.MESSAGE_FILE_NON_EXISTENT, "DoesNotExist.json");
 
-        Path filePath = getTempFilePath("DoesNotExist.json");
-        FileDeleteCommand fileDeleteCommand = new FileDeleteCommand(filePath);
+        String targetFilePathString = getTempFilePathString("DoesNotExist");
+        FileDeleteCommand fileDeleteCommand = new FileDeleteCommand(targetFilePathString);
 
         assertCommandFailure(fileDeleteCommand, storage, expectedMessage);
     }
@@ -84,8 +93,8 @@ public class FileDeleteCommandTest {
     public void execute_storageThrowsIoException_throwsCommandException() {
         String expectedMessage = String.format(FileDeleteCommand.MESSAGE_FAILED, "deleting");
 
-        Path filePath = getTempFilePath("AlreadyExists.json");
-        FileDeleteCommand fileDeleteCommand = new FileDeleteCommand(filePath);
+        String targetFilePathString = getTempFilePathString("AlreadyExists");
+        FileDeleteCommand fileDeleteCommand = new FileDeleteCommand(targetFilePathString);
         storage = new StorageStubThrowsIoException();
 
         assertThrows(CommandException.class, expectedMessage, () -> fileDeleteCommand.execute(storage));

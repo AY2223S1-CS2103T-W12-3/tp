@@ -11,15 +11,17 @@ import java.util.regex.Pattern;
 
 import seedu.rc4hdb.logic.commands.misccommands.HelpCommand;
 import seedu.rc4hdb.logic.commands.storagecommands.filecommands.FileCommand;
-import seedu.rc4hdb.logic.commands.storagecommands.filecommands.FileCreateCommand;
-import seedu.rc4hdb.logic.commands.storagecommands.filecommands.FileDeleteCommand;
-import seedu.rc4hdb.logic.commands.storagecommands.filecommands.FileSwitchCommand;
+import seedu.rc4hdb.logic.commands.storagecommands.filecommands.jsonfilecommands.FileCreateCommand;
+import seedu.rc4hdb.logic.commands.storagecommands.filecommands.jsonfilecommands.FileDeleteCommand;
+import seedu.rc4hdb.logic.commands.storagecommands.filecommands.jsonfilecommands.FileSwitchCommand;
 import seedu.rc4hdb.logic.parser.exceptions.ParseException;
 
 /**
  * Parses input arguments and creates a new FileCommand object.
  */
 public class FileCommandParser implements CommandParser<FileCommand> {
+
+    public static final String DATA_PREFIX = "data\\";
 
     private static final Pattern FILE_COMMAND_FORMAT = Pattern.compile("(?<secondCommandWord>\\S+) (?<arguments>.+)");
 
@@ -35,18 +37,19 @@ public class FileCommandParser implements CommandParser<FileCommand> {
         if (!FileCommand.isValidPath(fileName)) {
             throw new ParseException(String.format(MESSAGE_INVALID_COMMAND_FORMAT, MESSAGE_INVALID_FILE_NAME));
         }
+        final String filePathString = DATA_PREFIX + fileName;
         final Path jsonPath = Paths.get("data", fileName + ".json");
 
         switch (secondCommandWord) {
 
         case FileSwitchCommand.COMMAND_WORD:
-            return new FileSwitchCommand(jsonPath);
+            return new FileSwitchCommand(filePathString);
 
         case FileCreateCommand.COMMAND_WORD:
-            return new FileCreateCommand(jsonPath);
+            return new FileCreateCommand(filePathString);
 
         case FileDeleteCommand.COMMAND_WORD:
-            return new FileDeleteCommand(jsonPath);
+            return new FileDeleteCommand(filePathString);
 
         default:
             throw new ParseException(MESSAGE_UNKNOWN_COMMAND);
