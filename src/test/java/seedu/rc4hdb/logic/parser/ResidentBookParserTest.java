@@ -5,10 +5,14 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static seedu.rc4hdb.commons.core.Messages.MESSAGE_INVALID_COMMAND_FORMAT;
 import static seedu.rc4hdb.commons.core.Messages.MESSAGE_UNKNOWN_COMMAND;
 import static seedu.rc4hdb.logic.commands.modelcommands.ModelCommandTestUtil.NAME_DESC_AMY;
+import static seedu.rc4hdb.logic.commands.modelcommands.ModelCommandTestUtil.VALID_ALL_SPECIFIER_DESC;
+import static seedu.rc4hdb.logic.commands.modelcommands.ModelCommandTestUtil.VALID_ANY_SPECIFIER_DESC;
 import static seedu.rc4hdb.logic.commands.storagecommands.StorageCommandTestUtil.VALID_FILE_NAME_STRING;
 import static seedu.rc4hdb.logic.parser.commandparsers.FileCommandParser.DATA_PREFIX;
 import static seedu.rc4hdb.testutil.Assert.assertThrows;
 import static seedu.rc4hdb.testutil.TypicalIndexes.INDEX_FIRST_RESIDENT;
+import static seedu.rc4hdb.testutil.TypicalSpecifiers.ALL_SPECIFIER;
+import static seedu.rc4hdb.testutil.TypicalSpecifiers.ANY_SPECIFIER;
 
 import java.util.Arrays;
 import java.util.List;
@@ -40,6 +44,9 @@ import seedu.rc4hdb.testutil.ResidentBuilder;
 import seedu.rc4hdb.testutil.ResidentDescriptorBuilder;
 import seedu.rc4hdb.testutil.ResidentUtil;
 
+/**
+ * Unit tests for {@link ResidentBookParser}.
+ */
 public class ResidentBookParserTest {
 
     private final ResidentBookParser parser = new ResidentBookParser();
@@ -110,13 +117,25 @@ public class ResidentBookParserTest {
     }
 
     @Test
-    public void parseCommand_filter() throws Exception {
-        assertTrue(parser.parseCommand(FilterCommand.COMMAND_WORD + NAME_DESC_AMY) instanceof FilterCommand);
+    public void parseCommand_filterAll() throws Exception {
+        assertTrue(parser.parseCommand(FilterCommand.COMMAND_WORD + VALID_ALL_SPECIFIER_DESC
+                + NAME_DESC_AMY) instanceof FilterCommand);
         Resident resident = new ResidentBuilder().build();
         ResidentDescriptor descriptor = new ResidentDescriptorBuilder(resident).build();
         FilterCommand command = (FilterCommand) parser.parseCommand(FilterCommand.COMMAND_WORD
-                + " " + ResidentUtil.getResidentDescriptorDetails(descriptor));
-        assertEquals(new FilterCommand(descriptor), command);
+                + VALID_ALL_SPECIFIER_DESC + " " + ResidentUtil.getResidentDescriptorDetails(descriptor));
+        assertEquals(new FilterCommand(descriptor, ALL_SPECIFIER), command);
+    }
+
+    @Test
+    public void parseCommand_filterAny() throws Exception {
+        assertTrue(parser.parseCommand(FilterCommand.COMMAND_WORD + VALID_ANY_SPECIFIER_DESC
+                + NAME_DESC_AMY) instanceof FilterCommand);
+        Resident resident = new ResidentBuilder().build();
+        ResidentDescriptor descriptor = new ResidentDescriptorBuilder(resident).build();
+        FilterCommand command = (FilterCommand) parser.parseCommand(FilterCommand.COMMAND_WORD
+                + VALID_ANY_SPECIFIER_DESC + " " + ResidentUtil.getResidentDescriptorDetails(descriptor));
+        assertEquals(new FilterCommand(descriptor, ANY_SPECIFIER), command);
     }
 
     @Test

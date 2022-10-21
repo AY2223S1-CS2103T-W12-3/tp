@@ -1,4 +1,4 @@
-package seedu.rc4hdb.logic.commands.storagecommands.filecommands;
+package seedu.rc4hdb.logic.commands.storagecommands.filecommands.jsonfilecommands;
 
 import static seedu.rc4hdb.logic.commands.StorageModelCommandTestUtil.assertCommandFailure;
 import static seedu.rc4hdb.logic.commands.StorageModelCommandTestUtil.assertCommandSuccess;
@@ -18,8 +18,6 @@ import seedu.rc4hdb.commons.util.FileUtil;
 import seedu.rc4hdb.commons.util.JsonUtil;
 import seedu.rc4hdb.logic.StorageStub;
 import seedu.rc4hdb.logic.commands.exceptions.CommandException;
-import seedu.rc4hdb.logic.commands.storagecommands.filecommands.jsonfilecommands.FileSwitchCommand;
-import seedu.rc4hdb.logic.commands.storagecommands.filecommands.jsonfilecommands.JsonFileCommand;
 import seedu.rc4hdb.model.Model;
 import seedu.rc4hdb.model.ModelManager;
 import seedu.rc4hdb.model.ReadOnlyResidentBook;

@@ -1,6 +1,6 @@
 package seedu.rc4hdb.logic.commands.storagecommands.filecommands.jsonfilecommands;
 
-import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import seedu.rc4hdb.logic.commands.storagecommands.filecommands.FileCommand;
 
@@ -15,7 +15,7 @@ public abstract class JsonFileCommand extends FileCommand {
             + "Try another file.";
 
     public JsonFileCommand(String fileName) {
-        super(Path.of(fileName + JSON_POSTFIX));
+        super(Paths.get(fileName + JSON_POSTFIX));
     }
 
 }

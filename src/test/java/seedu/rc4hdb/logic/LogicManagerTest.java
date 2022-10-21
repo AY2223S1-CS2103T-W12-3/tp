@@ -39,6 +39,9 @@ import seedu.rc4hdb.model.ResidentBook;
 import seedu.rc4hdb.model.resident.Resident;
 import seedu.rc4hdb.storage.Storage;
 
+/**
+ * Unit tests for {@link LogicManager}.
+ */
 public class LogicManagerTest {
 
     private Model model;
