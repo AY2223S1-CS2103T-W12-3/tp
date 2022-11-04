@@ -12,7 +12,7 @@
             <HBox.margin>
                <Insets right="10.0" />
             </HBox.margin></StackPane>
-         <StackPane fx:id="venueListViewPlaceholder" HBox.hgrow="ALWAYS" />
+         <StackPane fx:id="venueListViewPlaceholder" stylesheets="@DarkTheme.css" HBox.hgrow="ALWAYS" />
       </children>
       <VBox.margin>
          <Insets />
