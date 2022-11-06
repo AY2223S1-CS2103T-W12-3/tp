@@ -11,11 +11,14 @@ import java.util.ArrayList;
 import org.junit.jupiter.api.Test;
 
 import seedu.rc4hdb.logic.commands.CommandResult;
+import seedu.rc4hdb.logic.commands.exceptions.CommandException;
 import seedu.rc4hdb.model.ModelStub;
 import seedu.rc4hdb.model.ReadOnlyVenueBook;
 import seedu.rc4hdb.model.VenueBook;
 import seedu.rc4hdb.model.venues.Venue;
 import seedu.rc4hdb.model.venues.VenueName;
+import seedu.rc4hdb.model.venues.exceptions.DuplicateVenueException;
+import seedu.rc4hdb.testutil.VenueBuilder;
 
 /**
  * Unit tests for {@link VenueAddCommand}.

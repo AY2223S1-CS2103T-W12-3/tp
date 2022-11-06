@@ -1,4 +1,4 @@
-package seedu.rc4hdb.logic.commands.residentcommands;
+package seedu.rc4hdb.logic.commands.venuecommands;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -8,42 +8,45 @@ import static seedu.rc4hdb.logic.commands.ModelCommandTestUtil.showResidentAtInd
 import static seedu.rc4hdb.testutil.TypicalIndexes.INDEX_FIRST_RESIDENT;
 import static seedu.rc4hdb.testutil.TypicalIndexes.INDEX_SECOND_RESIDENT;
 import static seedu.rc4hdb.testutil.TypicalResidents.getTypicalResidentBook;
+import static seedu.rc4hdb.testutil.TypicalVenues.getTypicalVenueBook;
 
 import org.junit.jupiter.api.Test;
 
 import seedu.rc4hdb.commons.core.Messages;
 import seedu.rc4hdb.commons.core.index.Index;
-import seedu.rc4hdb.logic.commands.venuecommands.VenueDeleteCommand;
+import seedu.rc4hdb.logic.commands.residentcommands.DeleteCommand;
 import seedu.rc4hdb.model.Model;
 import seedu.rc4hdb.model.ModelManager;
+import seedu.rc4hdb.model.ResidentBook;
 import seedu.rc4hdb.model.UserPrefs;
 import seedu.rc4hdb.model.VenueBook;
 import seedu.rc4hdb.model.resident.Resident;
+import seedu.rc4hdb.testutil.TypicalVenues;
 
 /**
  * Contains integration tests (interaction with the Model) and unit tests for
  * {@code DeleteCommand}.
  */
-public class DeleteCommandTest {
+public class VenueDeleteCommandTest {
 
-    private Model model = new ModelManager(getTypicalResidentBook(), new VenueBook(), new UserPrefs());
+    private Model model = new ModelManager(new ResidentBook(), getTypicalVenueBook(), new UserPrefs());
 
     @Test
     public void execute_validIndexUnfilteredList_success() {
-        Resident residentToDelete = model.getFilteredResidentList().get(INDEX_FIRST_RESIDENT.getZeroBased());
+        Venue residentToDelete = model.getVenueBook().(INDEX_FIRST_RESIDENT.getZeroBased());
         DeleteCommand deleteCommand = new DeleteCommand(INDEX_FIRST_RESIDENT);
 
-        String expectedMessage = String.format(VenueDeleteCommand.MESSAGE_SUCCESS, residentToDelete);
+        String expectedMessage = String.format(DeleteCommand.MESSAGE_DELETE_RESIDENT_SUCCESS, residentToDelete);
 
-        ModelManager expectedModel = new ModelManager(model.getResidentBook(), new VenueBook(), new UserPrefs());
-        expectedModel.deleteResident(residentToDelete);
+        ModelManager expectedModel = new ModelManager(model.getVenueBook(), new VenueBook(), new UserPrefs());
+        expectedModel.deleteVenue(residentToDelete);
 
         assertCommandSuccess(deleteCommand, model, expectedMessage, expectedModel);
     }
 
     @Test
     public void execute_invalidIndexUnfilteredList_throwsCommandException() {
-        Index outOfBoundIndex = Index.fromOneBased(model.getFilteredResidentList().size() + 1);
+        Index outOfBoundIndex = Index.fromOneBased(model.getFilteredVenueList().size() + 1);
         DeleteCommand deleteCommand = new DeleteCommand(outOfBoundIndex);
 
         assertCommandFailure(deleteCommand, model, Messages.MESSAGE_INVALID_RESIDENT_DISPLAYED_INDEX);
@@ -51,14 +54,14 @@ public class DeleteCommandTest {
 
     @Test
     public void execute_validIndexFilteredList_success() {
-        showResidentAtIndex(model, INDEX_FIRST_RESIDENT);
+        showVenueAtIndex(model, INDEX_FIRST_RESIDENT);
 
-        Resident residentToDelete = model.getFilteredResidentList().get(INDEX_FIRST_RESIDENT.getZeroBased());
+        Venue residentToDelete = model.getFilteredVenueList().get(INDEX_FIRST_RESIDENT.getZeroBased());
         DeleteCommand deleteCommand = new DeleteCommand(INDEX_FIRST_RESIDENT);
 
-        String expectedMessage = String.format(DeleteCommand.MESSAGE_DELETE_RESIDENT_SUCCESS, residentToDelete);
+        String expectedMessage = String.format(DeleteCommand.MESSAGE_DELETE_Venue_SUCCESS, residentToDelete);
 
-        Model expectedModel = new ModelManager(model.getResidentBook(), new VenueBook(), new UserPrefs());
+        Model expectedModel = new ModelManager(model.getVenueBook(), new VenueBook(), new UserPrefs());
         expectedModel.deleteResident(residentToDelete);
         showNoResident(expectedModel);
 
