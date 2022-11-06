@@ -41,11 +41,11 @@ public class AddCommandTest {
     }
 
     @Test
-    public void execute_duplicatePerson_throwsCommandException() throws CommandException {
+    public void execute_duplicatePerson_throwsCommandException() {
         Resident validResident = new ResidentBuilder().build();
         AddCommand addCommand = new AddCommand(validResident);
         ModelStub modelStub = new ModelStubWithResident(validResident);
-        addCommand.execute(modelStub);
+
         assertThrows(CommandException.class, AddCommand.MESSAGE_DUPLICATE_RESIDENT, ()
                 -> addCommand.execute(modelStub));
     }

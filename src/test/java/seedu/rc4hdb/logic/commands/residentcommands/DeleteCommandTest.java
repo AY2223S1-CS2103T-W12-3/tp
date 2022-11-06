@@ -13,7 +13,6 @@ import org.junit.jupiter.api.Test;
 
 import seedu.rc4hdb.commons.core.Messages;
 import seedu.rc4hdb.commons.core.index.Index;
-import seedu.rc4hdb.logic.commands.venuecommands.VenueDeleteCommand;
 import seedu.rc4hdb.model.Model;
 import seedu.rc4hdb.model.ModelManager;
 import seedu.rc4hdb.model.UserPrefs;
@@ -33,7 +32,7 @@ public class DeleteCommandTest {
         Resident residentToDelete = model.getFilteredResidentList().get(INDEX_FIRST_RESIDENT.getZeroBased());
         DeleteCommand deleteCommand = new DeleteCommand(INDEX_FIRST_RESIDENT);
 
-        String expectedMessage = String.format(VenueDeleteCommand.MESSAGE_SUCCESS, residentToDelete);
+        String expectedMessage = String.format(DeleteCommand.MESSAGE_DELETE_RESIDENT_SUCCESS, residentToDelete);
 
         ModelManager expectedModel = new ModelManager(model.getResidentBook(), new VenueBook(), new UserPrefs());
         expectedModel.deleteResident(residentToDelete);
