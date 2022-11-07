@@ -343,7 +343,7 @@ Deleted data can not be retrieved. Do use this command cautiously!
 ### Format for resident fields
 
 `n/NAME`
-* Whitespaces are allowed *i.e. `Michael B. Jordan` is allowed*.
+* Whitespaces are allowed *i.e. `Michael B Jordan` is allowed*.
 
 `p/PHONE_NUMBER`
 * Must be an **8**-digit non-negative integer.
