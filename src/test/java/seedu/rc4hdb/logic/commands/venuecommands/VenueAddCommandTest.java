@@ -5,40 +5,55 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static seedu.rc4hdb.testutil.Assert.assertThrows;
+import static seedu.rc4hdb.testutil.TypicalVenues.getTypicalVenues;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import org.junit.jupiter.api.Test;
 
 import seedu.rc4hdb.logic.commands.CommandResult;
+
+import seedu.rc4hdb.logic.commands.exceptions.CommandException;
 import seedu.rc4hdb.model.ModelStub;
 import seedu.rc4hdb.model.ReadOnlyVenueBook;
 import seedu.rc4hdb.model.VenueBook;
 import seedu.rc4hdb.model.venues.Venue;
 import seedu.rc4hdb.model.venues.VenueName;
+import seedu.rc4hdb.model.venues.exceptions.DuplicateVenueException;
 
 /**
  * Unit tests for {@link VenueAddCommand}.
  */
+
+
 public class VenueAddCommandTest {
 
     @Test
-    public void constructor_nullVenue_throwsNullPointerException() {
+    public void constructor_nullVenueName_throwsNullPointerException() {
         assertThrows(NullPointerException.class, () -> new VenueAddCommand(null));
     }
 
     @Test
     public void execute_venueAcceptedByModel_addSuccessful() throws Exception {
         ModelStubAcceptingVenueAdded modelStub = new ModelStubAcceptingVenueAdded();
-        VenueName validVenueName = new VenueName("Location");
+        VenueName validVenue = new VenueName("Meeting Room");
+
+        CommandResult commandResult = new VenueAddCommand(validVenue).execute(modelStub);
+
+        assertEquals(String.format(VenueAddCommand.MESSAGE_SUCCESS, validVenue), commandResult.getFeedbackToUser());
+        assertEquals(Arrays.asList(getTypicalVenues().get(0)), modelStub.venuesAdded);
+    }
+
+    @Test
+    public void execute_duplicateVenue_throwsCommandException() {
+        VenueName validVenueName = new VenueName("Meeting Room");
         Venue validVenue = new Venue(validVenueName);
+        VenueAddCommand venueAddCommand = new VenueAddCommand(validVenueName);
+        ModelStub modelStub = new ModelStubWithVenue(validVenue);
 
-        CommandResult commandResult = new VenueAddCommand(validVenueName).execute(modelStub);
-
-        assertEquals(String.format(VenueAddCommand.MESSAGE_SUCCESS, validVenueName), commandResult.getFeedbackToUser());
-        ArrayList<Venue> expectedArrayList = new ArrayList<>();
-        expectedArrayList.add(validVenue);
-        assertTrue(expectedArrayList.equals(modelStub.venuesAdded));
+        assertThrows(CommandException.class, String.format(VenueAddCommand.MESSAGE_DUPLICATE_VENUE, validVenueName), ()
+                -> venueAddCommand.execute(modelStub));
     }
 
     @Test
@@ -86,6 +101,14 @@ public class VenueAddCommandTest {
             requireNonNull(venue);
             return this.venue.isSameVenue(venue);
         }
+
+        @Override
+        public void addVenue(Venue venue) throws DuplicateVenueException {
+            requireNonNull(venue);
+            if (this.hasVenue(venue)) {
+                throw new DuplicateVenueException();
+            }
+        }
     }
 
     /**
@@ -111,5 +134,4 @@ public class VenueAddCommandTest {
             return new VenueBook();
         }
     }
-
 }
